@@ -21,9 +21,15 @@ public class CustomerServiceImpl implements CustomerService {
 
 
     @Override
-    public Customer save(Customer customer) {
+    public Customer save(Customer customer, boolean isUpdated) {
         customer.setUpdated(null);
-        customer.setCreated(new Date().getTime());
+        if (isUpdated) {
+            customer.setUpdated(new Date().getTime());
+            customer.setCreated(customer.getCreated());
+        } else {
+            customer.setCreated(new Date().getTime());
+        }
+
         customer.setIs_active(true);
         return customerRepository.save(customer);
     }
@@ -49,17 +55,15 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public Customer update(Customer customer, Long id) throws DeletedException {
         Customer customerById = customerRepository.getById(id);
-        System.out.println(customerById);
         if (customerById.isIs_active()) {
             customer.setUpdated(new Date().getTime());
             customer.setCreated(customerById.getCreated());
             customer.setFull_name(customer.getFull_name() != null ? customer.getFull_name() : customerById.getFull_name());
             customer.setPhone(customer.getPhone() != null ? customer.getPhone() : customerById.getPhone());
-            customer.setEmail(customer.getEmail() != null ? customer.getEmail() : customerById.getEmail());
+            customer.setEmail(customerById.getEmail());
             customer.setIs_active(true);
             customer.setId(customerById.getId());
-            //System.out.println(customer);
-            return customerRepository.save(customer);
+            return save(customer, true);
         }
         throw new DeletedException("Customer " + id + " was deleted");
     }

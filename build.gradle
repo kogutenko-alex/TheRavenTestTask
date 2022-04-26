@@ -25,6 +25,13 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
+task fatJar(type: Jar) {
+    from sourceSets.main.allSource
+    manifest {
+        attributes 'Main-Class': 'ua.kogutenko.market.Start'
+    }
+}
+
 flyway {
     url = 'jdbc:h2:file:./market_db'
     locations = [

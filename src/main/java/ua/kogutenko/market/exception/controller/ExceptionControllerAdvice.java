@@ -1,5 +1,6 @@
 package ua.kogutenko.market.exception.controller;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import ua.kogutenko.market.exception.CustomerNotFoundException;
 import ua.kogutenko.market.exception.DeletedException;
+import ua.kogutenko.market.exception.EmailShouldNotBeChangedException;
 import ua.kogutenko.market.exception.model.ErrorValidResponse;
 import ua.kogutenko.market.exception.model.ErrorExceptionResponse;
 
@@ -23,9 +25,31 @@ import java.util.*;
 @ControllerAdvice
 public class ExceptionControllerAdvice extends ResponseEntityExceptionHandler {
 
+    @ExceptionHandler(EmailShouldNotBeChangedException.class)
+    public ResponseEntity<ErrorExceptionResponse> handleEntityNotFoundException(EmailShouldNotBeChangedException e) {
+        ErrorExceptionResponse response = new ErrorExceptionResponse(
+                "Email exception",
+                e.getMessage(),
+                new SimpleDateFormat("yyyy.MM.dd HH:mm:ss").format(Calendar.getInstance().getTime()),
+                HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorExceptionResponse> handleEntityNotFoundException(Exception e) {
+        ErrorExceptionResponse response = new ErrorExceptionResponse(
+                "Global exception",
+                e.getMessage(),
+                new SimpleDateFormat("yyyy.MM.dd HH:mm:ss").format(Calendar.getInstance().getTime()),
+                HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<ErrorExceptionResponse> handleEntityNotFoundException(EntityNotFoundException e) {
-        ErrorExceptionResponse response = new ErrorExceptionResponse(e.getMessage(),
+        ErrorExceptionResponse response = new ErrorExceptionResponse(
+                "Entity not found",
+                e.getMessage(),
                 new SimpleDateFormat("yyyy.MM.dd HH:mm:ss").format(Calendar.getInstance().getTime()),
                 HttpStatus.INTERNAL_SERVER_ERROR);
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -33,7 +57,9 @@ public class ExceptionControllerAdvice extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(CustomerNotFoundException.class)
     public ResponseEntity<ErrorExceptionResponse> handleCustomerNotFoundException(CustomerNotFoundException e) {
-        ErrorExceptionResponse response = new ErrorExceptionResponse(e.getMessage(),
+        ErrorExceptionResponse response = new ErrorExceptionResponse(
+                "Customer not found",
+                e.getMessage(),
                 new SimpleDateFormat("yyyy.MM.dd HH:mm:ss").format(Calendar.getInstance().getTime()),
                 HttpStatus.INTERNAL_SERVER_ERROR);
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -41,7 +67,9 @@ public class ExceptionControllerAdvice extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(DeletedException.class)
     public ResponseEntity<ErrorExceptionResponse> handleDeletedCustomerException(DeletedException e) {
-        ErrorExceptionResponse response = new ErrorExceptionResponse(e.getMessage(),
+        ErrorExceptionResponse response = new ErrorExceptionResponse(
+                "Deleted customer",
+                e.getMessage(),
                 new SimpleDateFormat("yyyy.MM.dd HH:mm:ss").format(Calendar.getInstance().getTime()),
                 HttpStatus.INTERNAL_SERVER_ERROR);
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -55,5 +83,15 @@ public class ExceptionControllerAdvice extends ResponseEntityExceptionHandler {
         }
         ErrorValidResponse error = new ErrorValidResponse("Validation Failed", details);
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorExceptionResponse> handleUniqueEmailException(DataIntegrityViolationException e) {
+        ErrorExceptionResponse response = new ErrorExceptionResponse(
+                "Unique email",
+                e.getMessage(),
+                new SimpleDateFormat("yyyy.MM.dd HH:mm:ss").format(Calendar.getInstance().getTime()),
+                HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 
 public class ErrorExceptionResponse {
 
+    private String subject;
     private String message;
     private String date;
     private HttpStatus httpStatus;
@@ -11,7 +12,8 @@ public class ErrorExceptionResponse {
     public ErrorExceptionResponse() {
     }
 
-    public ErrorExceptionResponse(String message, String date, HttpStatus httpStatus) {
+    public ErrorExceptionResponse(String subject, String message, String date, HttpStatus httpStatus) {
+        this.subject = subject;
         this.message = message;
         this.date = date;
         this.httpStatus = httpStatus;
@@ -41,4 +43,11 @@ public class ErrorExceptionResponse {
         this.message = message;
     }
 
+    public String getSubject() {
+        return subject;
+    }
+
+    public void setSubject(String subject) {
+        this.subject = subject;
+    }
 }

@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CustomerService {
-    Customer save(Customer customer);
+    Customer save(Customer customer, boolean isUpdated);
     List<Customer> findAll();
     Optional<Customer> findById(Long id) throws DeletedException;
     Customer update(Customer client, Long id) throws DeletedException;

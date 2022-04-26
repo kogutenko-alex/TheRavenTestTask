@@ -3,11 +3,19 @@ package ua.kogutenko.market.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.validator.constraints.Length;
+import ua.kogutenko.market.model.marked.OnCreated;
+import ua.kogutenko.market.model.marked.OnUpdated;
 
 import javax.persistence.*;
-import javax.validation.constraints.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 
 @Entity
+@Table(uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"email"})
+})
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Customer {
     @Id
@@ -23,16 +31,22 @@ public class Customer {
     private boolean is_active;
 
 
-    @NotBlank(message = "Name cannot be empty")
-    @Length(min = 2, max = 50)
+    @NotBlank(groups = {OnCreated.class}, message = "Name cannot be empty")
+    @NotNull(groups = {OnCreated.class}, message = "Name cannot be null")
+    @Length(groups = {OnCreated.class, OnUpdated.class}, min = 2, max = 50)
     private String full_name;
-    @Email(regexp = "[a-z0-9._]+@[a-z0-9.-]+\\.[a-z]{2,3}",
-            flags = Pattern.Flag.CASE_INSENSITIVE)
-    @Length(min = 2, max = 100)
-    @NotEmpty(message = "Email cannot be empty")
+
+    @NotBlank(groups = {OnCreated.class}, message = "Email cannot be empty")
+    @NotNull(groups = {OnCreated.class}, message = "Email cannot be null")
+    @Email(groups = {OnCreated.class}, regexp = "[a-z0-9._]+@[a-z0-9.-]+\\.[a-z]{2,3}",
+            flags = Pattern.Flag.CASE_INSENSITIVE
+    )
+    @Length(groups = {OnCreated.class}, min = 2, max = 100)
+    @Column(name = "email",unique = true)
     private String email;
 
-    @Pattern(regexp = "(\\+)[0-9]{6,14}")
+    @Pattern(groups = {OnCreated.class, OnUpdated.class}, regexp = "(\\+)[0-9]{6,14}",
+            message = "Incorrect phone number")
     private String phone;
 
     public Customer() {
