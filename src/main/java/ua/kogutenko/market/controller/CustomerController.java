@@ -116,8 +116,9 @@ public class CustomerController {
      * @throws CustomerNotFoundException the customer not found exception
      */
     @DeleteMapping("/customers/{id}")
-    public void deleteCustomer(@PathVariable Long id) throws CustomerNotFoundException {
+    public ResponseEntity<String> deleteCustomer(@PathVariable Long id) throws CustomerNotFoundException {
         log.info(String.format("*********** %-20s ***********", "CONTROLLER DELETE " + id));
         customerService.delete(id);
+        return ResponseEntity.ok("customer " + id + " removed successfully.");
     }
 }

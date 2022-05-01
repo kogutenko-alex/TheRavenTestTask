@@ -41,6 +41,7 @@ public class CustomerServiceImpl implements CustomerService {
         if(customer == null)
             throw new NullPointerException("Customer is null when saving");
         customer.setCreated(new Date().getTime());
+        customer.set_active(true);
         return customerDAO.save(customer);
     }
 
@@ -103,8 +104,10 @@ public class CustomerServiceImpl implements CustomerService {
         log.info(String.format("*********** %-20s ***********", "SERVICE DELETE BY ID"));
         if(customerDAO.getById(id).isPresent()) {
             CustomerDTO customer = customerDAO.getById(id).get();
+            log.info("deleted: " + customer);
             customer.set_active(false);
-            customerDAO.save(customer);
+            customerDAO.update(customer);
+            return;
         }
         throw new CustomerNotFoundException("Customer not found with this id = " + id);
 
