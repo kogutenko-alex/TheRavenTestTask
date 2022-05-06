@@ -6,10 +6,12 @@ import ua.kogutenko.market.dao.impl.CustomerDAO;
 import ua.kogutenko.market.dto.CustomerDTO;
 import ua.kogutenko.market.exception.CustomerNotFoundException;
 import ua.kogutenko.market.exception.DeletedException;
+import ua.kogutenko.market.exception.InvalidRequestException;
 import ua.kogutenko.market.service.CustomerService;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -36,10 +38,9 @@ public class CustomerServiceImpl implements CustomerService {
 
 
     @Override
-    public CustomerDTO save(CustomerDTO customer) {
-        log.info(String.format("*********** %-20s ***********", "SERVICE SAVE"));
-        if(customer == null)
-            throw new NullPointerException("Customer is null when saving");
+    public CustomerDTO save(CustomerDTO customer) throws InvalidRequestException {
+        if (customer == null)
+            throw new InvalidRequestException("Customer is null when saving");
         customer.setCreated(new Date().getTime());
         customer.set_active(true);
         return customerDAO.save(customer);
@@ -47,7 +48,6 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public List<CustomerDTO> findAll() {
-        log.info(String.format("*********** %-20s ***********", "SERVICE FIND ALL"));
         return customerDAO
                 .getAll()
                 .stream()
@@ -56,60 +56,60 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public CustomerDTO findById(Long id) throws DeletedException, CustomerNotFoundException {
-        log.info(String.format("*********** %-20s ***********", "SERVICE FIND BY ID"));
-        if (customerDAO.getById(id).isPresent()) {
-            CustomerDTO customer = customerDAO.getById(id).get();
-            log.debug(customer);
-            if (customer.is_active()) {
-                log.info("customer found: " + customer);
-                return customer;
-            }
-            log.error("CustomerDTO " + id + " was deleted");
-            throw new DeletedException("CustomerDTO " + id + " was deleted");
+    public CustomerDTO findById(Long id) throws DeletedException, CustomerNotFoundException, InvalidRequestException {
+        if (id == null) {
+            throw new InvalidRequestException("ID should not be null!!!");
         }
-        throw new CustomerNotFoundException("Customer not found with this id = " + id);
+        Optional<CustomerDTO> optionalCustomer = customerDAO.getById(id);
+        if (optionalCustomer.isEmpty()) {
+            throw new CustomerNotFoundException(id);
+        }
+        if (optionalCustomer.get().is_active()) {
+            return optionalCustomer.get();
+        }
+        throw new DeletedException("CustomerDTO " + id + " was deleted");
     }
 
     @Override
-    public CustomerDTO update(CustomerDTO updated, Long id) throws DeletedException, CustomerNotFoundException {
-        log.info(String.format("*********** %-20s ***********", "SERVICE UPDATE ID " + id));
-        if(customerDAO.getById(id).isPresent()) {
-            CustomerDTO existing = customerDAO.getById(id).get();
-            log.info("existing: " + existing);
-            if (existing.is_active()) {
-                CustomerDTO updatedNew = updateCustomer(updated, existing);
-                log.info("updated:  " + updatedNew);
-                return customerDAO.update(updatedNew);
-            }
-            log.error("CustomerDTO " + id + " was deleted");
-            throw new DeletedException("Customer " + id + "deleted");
-        } throw new CustomerNotFoundException("Customer not found with this id = " + id);
+    public CustomerDTO update(CustomerDTO updated, Long id)
+            throws DeletedException, CustomerNotFoundException,
+            InvalidRequestException {
+        if (updated == null || id == null) {
+            throw new InvalidRequestException("Customer or ID must not be null!");
+        }
+        Optional<CustomerDTO> optionalRecord = customerDAO.getById(id);
+        if (optionalRecord.isEmpty()) {
+            throw new CustomerNotFoundException(id);
+        }
+        CustomerDTO existing = optionalRecord.get();
+        if (existing.is_active()) {
+            CustomerDTO updatedNew = updateCustomer(updated, existing);
+            return customerDAO.update(updatedNew);
+        }
+        throw new DeletedException(id);
     }
 
     private CustomerDTO updateCustomer(CustomerDTO updated, CustomerDTO existing) {
-        updated.setUpdated(new Date().getTime());
-        updated.setCreated(existing.getCreated());
-        updated.setFull_name(updated.getFull_name() != null ? updated.getFull_name() : existing.getFull_name());
-        updated.setPhone(updated.getPhone() != null ? updated.getPhone() : existing.getPhone());
-        updated.setEmail(existing.getEmail());
-        updated.set_active(true);
-        updated.setUpdated(new Date().getTime());
-        updated.setCreated(existing.getCreated());
-        return updated;
+        existing.setFull_name(updated.getFull_name() != null ? updated.getFull_name() : existing.getFull_name());
+        existing.setPhone(updated.getPhone() != null ? updated.getPhone() : existing.getPhone());
+        existing.setUpdated(new Date().getTime());
+        return existing;
     }
 
     @Override
-    public void delete(Long id) throws CustomerNotFoundException {
-        log.info(String.format("*********** %-20s ***********", "SERVICE DELETE BY ID"));
-        if(customerDAO.getById(id).isPresent()) {
-            CustomerDTO customer = customerDAO.getById(id).get();
-            log.info("deleted: " + customer);
-            customer.set_active(false);
-            customerDAO.update(customer);
-            return;
+    public void delete(Long id) throws CustomerNotFoundException, InvalidRequestException, DeletedException {
+        if (id == null) {
+            throw new InvalidRequestException("ID should not be null!!!");
         }
-        throw new CustomerNotFoundException("Customer not found with this id = " + id);
-
+        Optional<CustomerDTO> customer = customerDAO.getById(id);
+        if (customer.isEmpty()) {
+            throw new CustomerNotFoundException(id);
+        }
+        CustomerDTO deletedCustomer = customer.get();
+        if (!deletedCustomer.is_active()) {
+            throw new DeletedException(id);
+        }
+        deletedCustomer.set_active(false);
+        customerDAO.update(deletedCustomer);
     }
 }

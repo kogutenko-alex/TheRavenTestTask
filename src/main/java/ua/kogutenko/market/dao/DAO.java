@@ -1,5 +1,7 @@
 package ua.kogutenko.market.dao;
 
+import ua.kogutenko.market.exception.CustomerNotFoundException;
+
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Optional;
@@ -18,9 +20,11 @@ public interface DAO<T> extends Serializable {
      * Gets by id.
      *
      * @param id the id
+     * @throws CustomerNotFoundException when we catch EntityNotFoundException
      * @return the optional object
+     *
      */
-    Optional<T> getById(Long id);
+    Optional<T> getById(Long id) throws CustomerNotFoundException;
 
     /**
      * Gets all.

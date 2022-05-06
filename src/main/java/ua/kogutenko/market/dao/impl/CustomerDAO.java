@@ -4,8 +4,10 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import ua.kogutenko.market.dao.DAO;
 import ua.kogutenko.market.dto.CustomerDTO;
+import ua.kogutenko.market.exception.CustomerNotFoundException;
 import ua.kogutenko.market.repository.CustomerRepository;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -22,8 +24,13 @@ public class CustomerDAO implements DAO<CustomerDTO> {
     private final CustomerRepository customerRepository;
 
     @Override
-    public Optional<CustomerDTO> getById(Long id) {
-        return Optional.of(customerRepository.getById(id));
+    public Optional<CustomerDTO> getById(Long id) throws CustomerNotFoundException {
+        try {
+            return Optional.ofNullable(customerRepository.findById(id)
+                                               .orElseThrow(EntityNotFoundException::new));
+        } catch (EntityNotFoundException e) {
+            throw new CustomerNotFoundException(id);
+        }
     }
 
     @Override

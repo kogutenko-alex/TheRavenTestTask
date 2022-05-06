@@ -10,10 +10,9 @@ import java.lang.annotation.*;
  * @author Oleksandr Kogutenko
  * @version 0.0.1
  */
-@Documented
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
 @Constraint(validatedBy = UniqueEmailValidator.class)
+@Target(ElementType.FIELD)
+@Retention(RetentionPolicy.RUNTIME)
 public @interface UniqueEmail {
 
     String message() default "Email is exist";

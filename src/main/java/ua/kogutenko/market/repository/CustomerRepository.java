@@ -22,4 +22,6 @@ public interface CustomerRepository extends JpaRepository<CustomerDTO, Long> {
      * @return the boolean
      */
     boolean existsByEmail(String val);
+
+    CustomerDTO findByEmail(String email);
 }

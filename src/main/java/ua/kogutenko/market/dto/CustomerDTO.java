@@ -6,7 +6,8 @@ import lombok.*;
 import org.hibernate.validator.constraints.Length;
 import ua.kogutenko.market.dto.marked.OnCreated;
 import ua.kogutenko.market.dto.marked.OnUpdated;
-import ua.kogutenko.market.validations.EmailChecker;
+import ua.kogutenko.market.validations.UniqueEmail;
+import ua.kogutenko.market.validations.UpdateBan;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -26,6 +27,7 @@ import javax.validation.constraints.Pattern;
  * <p>7. phone - has length[6,14]; responsible for the storage about of phone.
  * <p>Hash code and equals by full_name, email and phone.
  * <p>
+ *
  * @author Oleksandr Kogutenko
  * @version 0.0.1
  */
@@ -34,6 +36,7 @@ import javax.validation.constraints.Pattern;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
+@Builder
 @Entity
 @Table(name = "customer",
         uniqueConstraints = {
@@ -55,15 +58,20 @@ public class CustomerDTO {
     @NotBlank(groups = {OnCreated.class}, message = "Name cannot be empty")
     @NotNull(groups = {OnCreated.class}, message = "Name cannot be null")
     @Length(groups = {OnCreated.class, OnUpdated.class}, min = 2, max = 50,
-            message = "Name's length must be between 2 and 100")
+            message = "The full name '${validatedValue}' must be between {min} and {max} characters long")
     private String full_name;
 
     @NotNull(groups = {OnCreated.class}, message = "Email cannot be null")
     @NotBlank(groups = {OnCreated.class}, message = "Email cannot be empty")
     @Length(groups = {OnCreated.class}, min = 2, max = 100,
-            message = "Email's length must be between 2 and 100")
-    @EmailChecker(groups = {OnCreated.class})
+            message = "The email '${validatedValue}' must be between {min} and {max} characters long")
+    @Pattern(groups = {OnCreated.class},
+            regexp = "[a-z0-9._]+@[a-z0-9.-]+\\.[a-z]{2,3}",
+            message = "The email '${validatedValue}' must be like some@some.ua")
+    @UniqueEmail(groups = {OnCreated.class})
+    @UpdateBan(groups = {OnUpdated.class})
     private String email;
+
     @Pattern(groups = {OnCreated.class, OnUpdated.class},
             regexp = "(\\+)[0-9]{6,14}", message = "Incorrect phone number (+111111)")
     private String phone;

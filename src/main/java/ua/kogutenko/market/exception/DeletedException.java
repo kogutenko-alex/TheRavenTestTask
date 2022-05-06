@@ -16,4 +16,8 @@ public class DeletedException extends Exception {
     public DeletedException(String s) {
         super(s);
     }
+
+    public DeletedException(final Long id) {
+        super("Customer " + id + " deleted");
+    }
 }

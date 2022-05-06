@@ -16,4 +16,8 @@ public class CustomerNotFoundException extends Exception {
     public CustomerNotFoundException(String message) {
         super(message);
     }
+
+    public CustomerNotFoundException(final Long id) {
+        super("Customer not found with this id = " + id);
+    }
 }
