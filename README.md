@@ -11,22 +11,37 @@ Database - h2 (filled the db with [flyway](https://github.com/kogutenko-alex/The
 ****
 # Endpoints
 ### GET
+
 Get all: 
+
 ![](img/getall.png)
+
 Get by id: 
+
 ![](img/getbyid.png)
+
 ****
 ### POST
+
 Post the customer:
+
 ![](img/createcustomer.png)
+
 Get new customer by id:
+
 ![](img/aftercreate.png)
+
 ****
 ### PUT (UPDATE)
+
 Put updated response: 
+
 ![](img/updatecustomer.png)
+
 Get updated customer by id:
+
 ![](img/afterupdate.png)
+
 ****
 ### DELETE
 
@@ -41,3 +56,5 @@ Delete by id:
 After: 
 
 ![](img/afterdelete.png)
+
+****
