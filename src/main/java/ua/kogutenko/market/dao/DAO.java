@@ -1,5 +1,7 @@
 package ua.kogutenko.market.dao;
 
+import ua.kogutenko.market.dto.CustomerDTO;
+
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Optional;
@@ -20,7 +22,7 @@ public interface DAO<T> extends Serializable {
      * @param id the id
      * @return the optional object
      */
-    Optional<T> getById(Long id);
+    Optional<CustomerDTO> getById(Long id);
 
     /**
      * Gets all.

@@ -1,5 +1,7 @@
 package ua.kogutenko.market.exception;
 
+import javax.persistence.EntityNotFoundException;
+
 /**
  * The customer not found exception.
  *
@@ -7,7 +9,7 @@ package ua.kogutenko.market.exception;
  * @author Oleksandr Kogutenko
  * @version 0.0.1
  */
-public class CustomerNotFoundException extends Exception {
+public class CustomerNotFoundException extends EntityNotFoundException {
     /**
      * Instantiates a new Customer not found exception.
      *
@@ -15,5 +17,9 @@ public class CustomerNotFoundException extends Exception {
      */
     public CustomerNotFoundException(String message) {
         super(message);
+    }
+
+    public CustomerNotFoundException(Long id) {
+        super("Customer not found with this id = " + id);
     }
 }

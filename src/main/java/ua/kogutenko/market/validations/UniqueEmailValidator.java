@@ -16,8 +16,11 @@ import javax.validation.ConstraintValidatorContext;
 @Component
 class UniqueEmailValidator implements ConstraintValidator<UniqueEmail, String> {
 
-    @Autowired
-    private CustomerRepository cr;
+    private final CustomerRepository cr;
+
+    public UniqueEmailValidator(final CustomerRepository cr) {
+        this.cr = cr;
+    }
 
     @Override
     public void initialize(UniqueEmail constraint) {

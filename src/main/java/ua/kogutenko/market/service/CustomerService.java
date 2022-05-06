@@ -3,8 +3,10 @@ package ua.kogutenko.market.service;
 import ua.kogutenko.market.exception.CustomerNotFoundException;
 import ua.kogutenko.market.exception.DeletedException;
 import ua.kogutenko.market.dto.CustomerDTO;
+import ua.kogutenko.market.exception.InvalidRequestException;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * The interface of customer service.
@@ -37,7 +39,7 @@ public interface CustomerService {
      * @throws DeletedException          the deleted exception
      * @throws CustomerNotFoundException the customer not found exception
      */
-    CustomerDTO findById(Long id) throws DeletedException, CustomerNotFoundException;
+    Optional<CustomerDTO> findById(Long id) throws DeletedException, CustomerNotFoundException, InvalidRequestException;
 
     /**
      * Update customer.
@@ -48,7 +50,8 @@ public interface CustomerService {
      * @throws DeletedException          the deleted exception
      * @throws CustomerNotFoundException the customer not found exception
      */
-    CustomerDTO update(CustomerDTO client, Long id) throws DeletedException, CustomerNotFoundException;
+    CustomerDTO update(CustomerDTO client, Long id) throws DeletedException, CustomerNotFoundException,
+            InvalidRequestException;
 
     /**
      * Delete by id.
@@ -57,4 +60,6 @@ public interface CustomerService {
      * @throws CustomerNotFoundException the customer not found exception
      */
     void delete(Long id) throws CustomerNotFoundException;
+
+    boolean existsById(Long id);
 }
